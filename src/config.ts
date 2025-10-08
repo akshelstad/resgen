@@ -1,9 +1,12 @@
+// "dev": "npx tsc && node dist/index.js",
+
 import type { MigrationConfig } from "drizzle-orm/migrator";
 
 type Config = {
   api: APIConfig;
   db: DBConfig;
   jwt: JWTConfig;
+  ai: AIConfig;
 };
 
 type APIConfig = {
@@ -21,6 +24,10 @@ type JWTConfig = {
   refreshDuration: number;
   secret: string;
   issuer: string;
+};
+
+type AIConfig = {
+  key: string;
 };
 
 process.loadEnvFile();
@@ -49,5 +56,8 @@ export const cfg: Config = {
     refreshDuration: 60 * 60 * 24 * 60 * 1000,
     secret: envOrThrow("JWT_SECRET"),
     issuer: "resgen",
+  },
+  ai: {
+    key: envOrThrow("OPENAI_KEY"),
   },
 };

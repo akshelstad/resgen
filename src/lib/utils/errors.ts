@@ -37,3 +37,11 @@ export class InternalServerError extends Error {
     super(message);
   }
 }
+
+// 502
+export class BadGatewayError extends Error {
+  code: number = 502;
+  constructor(message: string) {
+    super(message);
+  }
+}
