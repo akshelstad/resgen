@@ -8,8 +8,15 @@
     "strict": true,
     "moduleResolution": "nodenext",
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "#api/*": ["src/api/*"],
+      "#lib/*": ["src/lib/*"],
+      "#db/*": ["src/db/*"],
+      "#config": ["src/config.ts"],
+      "#auth": ["src/auth.ts"]
+    }
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts", "./src/**/*.d.ts"],
   "exclude": ["node_modules"]
 }

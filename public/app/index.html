@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ResGen Control Panel</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <header class="app-header">
+        <h1>ResGen Control Panel</h1>
+        <div class="auth-status">
+          <span id="auth-state">Not signed in</span>
+          <button id="signout-btn" type="button" class="ghost hidden">
+            Sign out
+          </button>
+        </div>
+      </header>
+
+      <section id="messages" aria-live="polite"></section>
+
+      <section id="login-section">
+        <h2>Sign in</h2>
+        <form id="login-form" class="card">
+          <label>
+            Username
+            <input name="username" autocomplete="username" required />
+          </label>
+          <label>
+            Password
+            <input
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+          <button type="submit">Sign in</button>
+        </form>
+      </section>
+
+      <section id="profile-section" class="hidden">
+        <h2>Profile</h2>
+        <form id="profile-form" class="card">
+          <div class="form-grid">
+            <label>
+              Name
+              <input name="name" required />
+            </label>
+            <label>
+              Title
+              <input name="title" />
+            </label>
+            <label>
+              Target Role
+              <input name="targetRole" />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" />
+            </label>
+            <label>
+              Phone
+              <input name="phone" />
+            </label>
+            <label>
+              Skills (comma separated)
+              <input name="skills" />
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit">Save profile</button>
+          </div>
+        </form>
+        <pre id="profile-preview" class="preview"></pre>
+      </section>
+
+      <section id="experience-section" class="hidden">
+        <div class="section-header">
+          <h2>Experience</h2>
+          <button id="experience-refresh" type="button" class="ghost">
+            Refresh
+          </button>
+        </div>
+        <form id="experience-form" class="card">
+          <div class="form-grid">
+            <label>
+              Company
+              <input name="company" required />
+            </label>
+            <label>
+              Title
+              <input name="title" required />
+            </label>
+            <label>
+              Location
+              <input name="location" />
+            </label>
+            <label>
+              Start (YYYY-MM)
+              <input name="startDate" placeholder="2023-01" required />
+            </label>
+            <label>
+              End (YYYY-MM or blank)
+              <input name="endDate" placeholder="2024-06" />
+            </label>
+            <label>
+              Bullets (one per line)
+              <textarea name="bullets" rows="4"></textarea>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit">Add experience</button>
+            <button id="experience-clear" type="button" class="danger ghost">
+              Delete all
+            </button>
+          </div>
+        </form>
+        <ul id="experience-list" class="card list"></ul>
+      </section>
+
+      <section id="education-section" class="hidden">
+        <div class="section-header">
+          <h2>Education</h2>
+          <button id="education-refresh" type="button" class="ghost">
+            Refresh
+          </button>
+        </div>
+        <form id="education-form" class="card">
+          <div class="form-grid">
+            <label>
+              School
+              <input name="school" required />
+            </label>
+            <label>
+              Credential
+              <input name="credential" required />
+            </label>
+            <label>
+              Year
+              <input type="number" name="year" min="1900" max="2100" />
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit">Add education</button>
+            <button id="education-clear" type="button" class="danger ghost">
+              Delete all
+            </button>
+          </div>
+        </form>
+        <ul id="education-list" class="card list"></ul>
+      </section>
+
+      <section id="resume-section" class="hidden">
+        <div class="section-header resume-actions">
+          <h2>Resume</h2>
+          <div class="resume-buttons">
+            <button id="resume-generate" type="button">Generate draft</button>
+            <button id="resume-generate-pdf" type="button" class="ghost">
+              Generate PDF
+            </button>
+            <a
+              id="resume-download"
+              class="ghost link-button hidden"
+              download="resume.pdf"
+              rel="noopener"
+            >
+              Download PDF
+            </a>
+          </div>
+        </div>
+        <div class="resume-panels">
+          <pre id="resume-output" class="preview"></pre>
+          <iframe
+            id="resume-frame"
+            class="pdf-frame hidden"
+            title="Resume preview"
+          ></iframe>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

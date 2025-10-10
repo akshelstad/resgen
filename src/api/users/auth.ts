@@ -1,21 +1,21 @@
-import { getUserByUsername } from "../db/queries/users.js";
-import { respondWithJSON } from "../lib/utils/json.js";
-import { UnauthorizedError } from "../lib/utils/errors.js";
+import { getUserByUsername } from "../../db/queries/users/users.js";
+import { respondWithJSON } from "../../lib/json/response.js";
+import { UnauthorizedError } from "../../lib/errors/http.js";
 import {
   checkPasswordHash,
   getBearerToken,
   makeJWT,
   makeRefreshToken,
-} from "../auth.js";
+} from "../../auth.js";
 
 import { Request, Response } from "express";
-import { cfg } from "../config.js";
+import { cfg } from "../../config.js";
 import type { UserResponse } from "./users.js";
 import {
   revokeRefreshToken,
   saveRefreshToken,
   userForRefreshToken,
-} from "../db/queries/refresh.js";
+} from "../../db/queries/auth/refresh.js";
 
 const DEF_DURATION = cfg.jwt.defaultDuration;
 const SECRET = cfg.jwt.secret;
@@ -46,7 +46,7 @@ export async function handlerLogin(req: Request, res: Response) {
   const accessToken = await makeJWT(user.id, DEF_DURATION, SECRET);
   const refreshToken = await makeRefreshToken();
 
-  const saved = saveRefreshToken(user.id, refreshToken);
+  const saved = await saveRefreshToken(user.id, refreshToken);
   if (!saved) {
     throw new UnauthorizedError("unable to save refresh token");
   }

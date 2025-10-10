@@ -7,7 +7,6 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { arrayBuffer } from "stream/consumers";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -39,23 +38,35 @@ export const refreshTokens = pgTable("refresh_tokens", {
 
 export type NewRefreshToken = typeof refreshTokens.$inferInsert;
 
-export const userProfiles = pgTable("user_profiles", {
-  userId: uuid("user_id")
-    .primaryKey()
-    .references(() => users.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  title: text("title"),
-  targetRole: text("target_role"),
-  skills: text("skills")
-    .array()
-    .notNull()
-    .default(sql`'{}'::text[]`),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
+export const userProfiles = pgTable(
+  "user_profiles",
+  {
+    userId: uuid("user_id")
+      .primaryKey()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    title: text("title"),
+    targetRole: text("target_role"),
+    email: varchar("email", { length: 320 }),
+    phone: varchar("phone", { length: 32 }),
+    skills: text("skills")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => {
+    return {
+      contactRequired: {
+        check: sql`CHECK (email IS NOT NULL OR phone IS NOT NULL)`,
+      },
+    };
+  }
+);
 
 export type NewUserProfile = typeof userProfiles.$inferInsert;
 export type UserProfile = typeof userProfiles.$inferSelect;
@@ -75,7 +86,6 @@ export const experiences = pgTable("experiences", {
     .array()
     .notNull()
     .default(sql`'{}'::text[]`),
-  // tech: pgArray(text("tech")).default(sql`ARRAY[]::text[]`),
   // optional UI ordering if you don’t want to rely on date sorting
   sortOrder: integer("sort_order").default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -86,6 +96,7 @@ export const experiences = pgTable("experiences", {
 });
 
 export type NewExperience = typeof experiences.$inferInsert;
+export type Experience = typeof experiences.$inferSelect;
 
 export const educations = pgTable("educations", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -103,6 +114,7 @@ export const educations = pgTable("educations", {
 });
 
 export type NewEducation = typeof educations.$inferInsert;
+export type Education = typeof educations.$inferSelect;
 
 export const resumeDrafts = pgTable("resume_drafts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -119,6 +131,7 @@ export const resumeDrafts = pgTable("resume_drafts", {
 });
 
 export type NewResumeDraft = typeof resumeDrafts.$inferInsert;
+export type ResumeDraft = typeof resumeDrafts.$inferSelect;
 
 export const userRelations = relations(users, ({ one, many }) => ({
   profile: one(userProfiles, {

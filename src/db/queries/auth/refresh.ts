@@ -1,8 +1,8 @@
-import { db } from "../index.js";
+import { db } from "../../index.js";
 import { eq, isNull, gt, and } from "drizzle-orm";
-import { refreshTokens, users } from "../schema.js";
-import { cfg } from "../../config.js";
-import { InternalServerError } from "../../lib/utils/errors.js";
+import { refreshTokens, users } from "../../schema.js";
+import { cfg } from "../../../config.js";
+import { InternalServerError } from "../../../lib/errors/http.js";
 
 const REF_DURATION = cfg.jwt.refreshDuration;
 

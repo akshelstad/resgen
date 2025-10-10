@@ -2,15 +2,16 @@ import express from "express";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
-import { handlerReadiness } from "./api/readiness.js";
-import { handlerReset } from "./api/reset.js";
-import { handlerLogin, handlerRefresh, handlerRevoke } from "./api/auth.js";
-import { handlerAddUser, handlerUpdateUser } from "./api/users.js";
-import { middlewareErrors, middlewareLogResponses } from "./api/middleware.js";
-
-import { cfg } from "./config.js";
-import { handlerGenerateResume } from "./api/resume.js";
+import { handlerReset } from "./api/dev/reset.js";
+import { middlewareErrors } from "#api/middleware/errors.js";
+import { middlewareLogResponses } from "#api/middleware/logging.js";
+import { router as apiRouter } from "#api/routes.js";
+import { cfg } from "#config";
+import { asyncHandler } from "#lib/http/asyncHandler.js";
 
 const migrationClient = postgres(cfg.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), cfg.db.migrationConfig);
@@ -19,39 +20,27 @@ const PORT = cfg.api.port;
 
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const projectRoot = process.cwd();
+const staticDir =
+  [
+    join(__dirname, "app"),
+    join(projectRoot, "public/app"),
+    join(projectRoot, "src/app"),
+  ].find((candidate) => existsSync(candidate)) ??
+  (() => {
+    throw new Error("Static assets directory not found");
+  })();
+
 app.use(middlewareLogResponses);
 app.use(express.json());
 
-app.use("/app", express.static("./src/app"));
+app.use("/app", express.static(staticDir));
 
-app.get("/api/healthz", (req, res, next) => {
-  Promise.resolve(handlerReadiness(req, res)).catch(next);
-});
-app.post("/admin/reset", (req, res, next) => {
-  Promise.resolve(handlerReset(req, res)).catch(next);
-});
+app.post("/admin/reset", asyncHandler(handlerReset));
 
-app.post("/api/login", (req, res, next) => {
-  Promise.resolve(handlerLogin(req, res).catch(next));
-});
-
-app.post("/api/users", (req, res, next) => {
-  Promise.resolve(handlerAddUser(req, res).catch(next));
-});
-app.put("/api/users", (req, res, next) => {
-  Promise.resolve(handlerUpdateUser(req, res).catch(next));
-});
-
-app.post("/api/refresh", (req, res, next) => {
-  Promise.resolve(handlerRefresh(req, res).catch(next));
-});
-app.post("/api/revoke", (req, res, next) => {
-  Promise.resolve(handlerRevoke(req, res).catch(next));
-});
-
-app.post("/api/resume", (req, res, next) => {
-  Promise.resolve(handlerGenerateResume(req, res).catch(next));
-});
+app.use("/api", apiRouter);
 
 app.use(middlewareErrors);
 

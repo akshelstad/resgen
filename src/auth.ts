@@ -8,7 +8,7 @@ import { JwtPayload } from "jsonwebtoken";
 
 import type { Request } from "express";
 
-import { BadRequestError, UnauthorizedError } from "./lib/utils/errors.js";
+import { BadRequestError, UnauthorizedError } from "./lib/errors/http.js";
 import { cfg } from "./config.js";
 
 const ISSUER = cfg.jwt.issuer;

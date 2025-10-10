@@ -1,27 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { respondWithError } from "../lib/utils/json.js";
+import { respondWithError } from "../../lib/json/response.js";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../lib/utils/errors.js";
-
-export function middlewareLogResponses(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-  res.on("finish", () => {
-    const { statusCode } = res;
-
-    if (statusCode > 399) {
-      console.log(`[NON-OK] ${req.method} ${req.url} - Status: ${statusCode}`);
-    }
-  });
-
-  next();
-}
+  InternalServerError,
+  BadGatewayError,
+} from "../../lib/errors/http.js";
 
 export function middlewareErrors(
   err: Error,
@@ -33,7 +19,9 @@ export function middlewareErrors(
     err instanceof BadRequestError ||
     err instanceof UnauthorizedError ||
     err instanceof ForbiddenError ||
-    err instanceof NotFoundError
+    err instanceof NotFoundError ||
+    err instanceof InternalServerError ||
+    err instanceof BadGatewayError
   ) {
     console.log(`error: ${err.code} - ${err.message}`);
     respondWithError(res, err.code, err.message);

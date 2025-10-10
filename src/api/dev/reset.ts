@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { ForbiddenError } from "../lib/utils/errors.js";
-import { reset } from "../db/queries/users.js";
-import { cfg } from "../config.js";
+import { ForbiddenError } from "../../lib/errors/http.js";
+import { reset } from "../../db/queries/users/users.js";
+import { cfg } from "../../config.js";
 
 export async function handlerReset(_: Request, res: Response) {
   if (cfg.api.platform !== "dev") {
